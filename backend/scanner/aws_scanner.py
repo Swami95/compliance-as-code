@@ -17,10 +17,32 @@ def scan_aws_account(credentials):
 
     s3_buckets = s3.list_buckets()["Buckets"]
 
-    resources = {
-        "iam_users": users,
-        "s3_buckets": s3_buckets,
-    }
+resources = {
+    "s3_buckets": [
+        {"Name": "bucket-1", "ACL": "private"},
+        {"Name": "bucket-2", "ACL": "public"}  # mocked ACL
+    ],
+    "iam_users": [
+        {"UserName": "alice", "mfa_enabled": True},
+        {"UserName": "bob", "mfa_enabled": False}
+    ],
+    "security_groups": [
+        {
+            "GroupId": "sg-001",
+            "IpPermissions": [
+                {
+                    "FromPort": 22,
+                    "IpRanges": [{"CidrIp": "0.0.0.0/0"}]
+                }
+            ]
+        }
+    ],
+    "rds_instances": [
+        {"DBInstanceIdentifier": "db-prod", "StorageEncrypted": False}
+    ],
+    "cloudtrail_enabled": False
+}
+
 
     policies = load_policies("scanner/rules/soc2.yaml")
     violations = evaluate(resources, policies)
