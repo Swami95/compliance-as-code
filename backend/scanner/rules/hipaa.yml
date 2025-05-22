@@ -1,0 +1,60 @@
+- id: HIPAA-S3-001
+  title: "S3 buckets must not be public"
+  framework: HIPAA
+  section: "§164.312(a)(1) – Access Control"
+  service: s3
+  severity: critical
+  detect:
+    type: bucket_acl
+    match: "public"
+  description: "Public S3 buckets can expose PHI. Buckets must be private."
+  remediation: "Update the bucket policy to restrict access. Use bucket-level IAM policies or VPC endpoints."
+
+- id: HIPAA-IAM-001
+  title: "MFA must be enabled for all IAM users"
+  framework: HIPAA
+  section: "§164.312(d) – Person or Entity Authentication"
+  service: iam
+  severity: high
+  detect:
+    type: mfa_check
+  description: "All IAM users must use multi-factor authentication to access sensitive systems containing PHI."
+  remediation: "Enable MFA for all IAM users from the AWS IAM console or enforce via IAM policy."
+
+- id: HIPAA-EC2-001
+  title: "No security groups should allow unrestricted SSH access"
+  framework: HIPAA
+  section: "§164.312(a)(1) – Access Control"
+  service: ec2
+  severity: high
+  detect:
+    type: security_group_check
+    port: 22
+    cidr: "0.0.0.0/0"
+  description: "SSH (port 22) open to the world is a major risk for systems handling PHI."
+  remediation: "Restrict SSH access to known IP addresses using tighter security group rules."
+
+- id: HIPAA-RDS-001
+  title: "RDS databases must have encryption enabled at rest"
+  framework: HIPAA
+  section: "§164.312(e)(2)(ii) – Encryption"
+  service: rds
+  severity: critical
+  detect:
+    type: encryption_check
+    resource_field: StorageEncrypted
+    match: false
+  description: "RDS instances must encrypt all data at rest to protect PHI."
+  remediation: "Enable encryption during creation. For existing unencrypted RDS, create a snapshot and restore it with encryption."
+
+- id: HIPAA-CLOUDTRAIL-001
+  title: "CloudTrail must be enabled in all regions"
+  framework: HIPAA
+  section: "§164.312(b) – Audit Controls"
+  service: cloudtrail
+  severity: critical
+  detect:
+    type: cloudtrail_check
+    match: false
+  description: "HIPAA requires complete audit logging for systems handling PHI."
+  remediation: "Enable AWS CloudTrail in all regions and ensure logs are delivered to an encrypted S3 bucket."
