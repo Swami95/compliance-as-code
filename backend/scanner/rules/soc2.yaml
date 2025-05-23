@@ -1,4 +1,0 @@
-- id: SOC2-IAM-001
-  title: "No IAM user should have admin access"
-  description: "AdministratorAccess gives full access. Use roles with limited scope."
-  remediation: "Remove the AdministratorAccess policy from IAM user."
